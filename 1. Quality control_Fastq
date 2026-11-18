@@ -1,0 +1,40 @@
+#!/bin/bash
+#SBATCH --job-name=FastQC
+#SBATCH --partition=std
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=2GB
+#SBATCH --nodes=1
+#SBATCH --array=1-X
+#SBATCH --time=01:00:00
+#SBATCH -o FastQC_%a.out
+#SBATCH -e FastQC_%a.err
+
+# IMPORT MODULE
+#################
+module load fastqc
+
+# SET YOUR VARIABLE
+###################
+
+# Path to Fastq Folder
+Fq_Path="/Path/To/raw_data/"
+
+# Get job number index (minus one : list are 0-based index in bash)
+idx=$((SLURM_ARRAY_TASK_ID-1))
+
+# BAM AND SAMPLE NAME EXTRACTION
+####################################
+
+# Create a list of Fq file in the "Fq_file_list"
+mapfile -t Fq_file_list < <(find ${Fq_Path} -maxdepth 1 -name "*.fastq.gz" | sort -V)
+
+# get the current index of the job list (iterate over 1 to 72)
+current_Fq_file="${Fq_file_list[$idx]}"
+
+#=============#
+# FASTQC
+#=============#
+
+# run fastqc
+mkdir -p fastqc
+fastqc -o fastqc -t "$SLURM_CPUS_PER_TASK" "$current_Fq_file"

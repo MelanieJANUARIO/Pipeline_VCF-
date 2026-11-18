@@ -1,44 +1,92 @@
 # Pipeline_VCF
 
-Author : Melanie Januario
+**Author:** Melanie Januario
 
-**Whole Genome Sequencing (WGS) Variant Calling Pipeline**
+**Whole Genome Sequencing (WGS) Variant Calling Pipeline: from raw FASTQ to unfiltered VCF**
 
-**Overview**
+## Overview
 
-This repository contains a bioinformatics pipeline for variant calling from Whole Genome Sequencing (WGS) data, covering the entire workflow from raw FASTQ quality control to the generation of unfiltered VCF files.
+This repository contains a step-by-step bioinformatics pipeline for variant calling from Whole Genome Sequencing (WGS) data. It covers the workflow from raw FASTQ quality control to the generation of **unfiltered VCF files**.
 
-All scripts are designed and optimized for execution on High-Performance Computing (HPC) clusters using the SLURM workload manager.
+The pipeline is **built progressively, one step at a time**. Each step has its own directory containing the SLURM scripts and a dedicated `README.md` with detailed instructions. Steps are added to the repository as they are completed (see the status column below).
 
-The pipeline is organized into separate directories, each containing the scripts required for a specific analysis step, along with a dedicated README.md file providing detailed instructions for execution.
+All scripts are designed for execution on High-Performance Computing (HPC) clusters using the **SLURM** workload manager, and process samples in parallel with job arrays.
 
-**The pipeline consists of the following steps:**
+> **Scope:** this pipeline stops at the generation of raw, **unfiltered** VCF files. Variant filtering and annotation are not included.
 
-1. **Quality Control:** Assessment of raw FASTQ sequencing data quality using FastQC.
-2. **Read Trimming:** Adapter removal and quality-based trimming of FASTQ reads using Trimmomatic.
-3. **Read Mapping and BAM Processing:** Alignment of sequencing reads to a reference genome using BWA, followed by BAM file processing and preprocessing with Picard and SAMtools.
-4. **Variant Calling:** Identification of genetic variants and generation of unfiltered VCF files using BCFtools.
-Dependencies
+## Pipeline steps
 
-**The following software tools are required to run the pipeline:**
+| Step | Directory | Description | Tools | Status |
+|------|-----------|-------------|-------|--------|
+| 1 | `01_fastqc/` | **Quality Control:** assessment of raw FASTQ quality, with a global summary report | FastQC, MultiQC | Available |
+| 2 | `02_trimming/` | **Read Trimming:** adapter removal and quality-based trimming | Trimmomatic | Available |
+| 3 | `03_mapping/` | **Read Mapping and BAM Processing:** alignment to the reference genome, then BAM processing | BWA, Picard, SAMtools | In progress |
+| 4 | `04_variant_calling/` | **Variant Calling:** identification of variants and generation of unfiltered VCF files | BCFtools | In progress |
 
-- `FastQC`
-- `Trimmomatic`
-- `BWA`
-- `Picard`
-- `SAMtools`
-- `BCFtools`
+## Workflow
 
-Make sure all dependencies are installed and properly configured in your environment before running the pipeline.
+```
+Raw FASTQ
+   |
+   v
+[1] FastQC + MultiQC   -> quality reports
+   |
+   v
+[2] Trimmomatic        -> trimmed paired FASTQ
+   |
+   v
+[3] BWA + Picard + SAMtools -> processed BAM
+   |
+   v
+[4] BCFtools           -> unfiltered VCF
+```
 
-**Usage**
+## Repository structure
 
-Each pipeline step is provided in its own subdirectory. Detailed instructions, including script execution and configuration requirements, are available in the corresponding README.md file.
+```
+Pipeline_VCF/
+├── 01_fastqc/
+│   ├── fastqc.sh
+│   ├── multiqc.sh
+│   └── README.md
+├── 02_trimming/
+│   ├── trimmomatic.sh
+│   └── README.md
+├── 03_mapping/            (in progress)
+├── 04_variant_calling/    (in progress)
+└── README.md
+```
 
-Follow the steps in the order presented above to ensure a consistent and reproducible analysis workflow.
+## Dependencies
 
-**Computational Environment**
+| Tool | Version | Used in step |
+|------|---------|--------------|
+| FastQC | x.x.x | 1 |
+| MultiQC | 1.31 | 1 |
+| Trimmomatic | 0.39 | 2 |
+| BWA | x.x.x | 3 |
+| Picard | x.x.x | 3 |
+| SAMtools | x.x | 3, 4 |
+| BCFtools | x.x | 4 |
 
-- Job Scheduler: `SLURM`
-- Input: `Raw WGS FASTQ files`
-- Output: `Unfiltered VCF files containing called variants`
+Make sure all tools are installed (or available as modules) and properly configured in your environment before running the pipeline. Module names in the scripts (`module load ...`) are specific to our cluster and may need to be adapted.
+
+## Usage
+
+1. Start with step 1 and follow the steps in the order shown above, so that the analysis stays consistent and reproducible.
+2. For each step, open its directory and follow the instructions in the corresponding `README.md`: variables to edit, how to submit the job, and expected outputs.
+3. The output of one step is the input of the next one.
+
+## Input data
+
+- Raw paired-end WGS FASTQ files, named `<sample>_R1.fastq.gz` and `<sample>_R2.fastq.gz`
+- A reference genome in FASTA format (details in the mapping step)
+
+No sequencing data or reference genome is included in this repository.
+
+## Computational environment
+
+- **Platform:** High-Performance Computing (HPC) cluster
+- **Job scheduler:** SLURM
+- **Input:** raw WGS FASTQ files
+- **Output:** unfiltered VCF files containing called variants

@@ -25,16 +25,7 @@ Modules are loaded with `module load bwa/0.7.18/gcc`, `module load samtools/1.23
 ## Input
 
 - Trimmed paired FASTQ files from step 2, named `<sample>_R1.trim.paired.fastq.gz` and `<sample>_R2.trim.paired.fastq.gz`
-- A reference genome in FASTA format, **indexed before running the script**:
-
-```bash
-module load bwa/0.7.18/gcc samtools/1.23.1/gcc picard/2.18.29/java
-
-bwa index genome_reference.fa
-samtools faidx genome_reference.fa
-picard CreateSequenceDictionary R=genome_reference.fa O=genome_reference.dict
-```
-
+- A reference genome in FASTA format, uncompressed (not `.fa.gz`), **indexed before running the mapping** (see "Reference genome indexing" below)
 - A text file `samples.txt` listing the sample names, one per line, without the `_R1` / `_R2` suffix:
 
 ```
@@ -47,8 +38,51 @@ sample3
 
 | File | Description |
 |------|-------------|
+| `index_genome.sh` | SLURM script indexing the reference genome (to run once, before mapping) |
 | `mapping.sh` | SLURM job array script: BWA-MEM, sort, MarkDuplicates, index, statistics |
 | `README.md` | This file |
+
+## Reference genome indexing
+
+The reference genome must be indexed once, before the mapping. Three indexes are required, all written **next to the FASTA file**:
+
+| Index | Tool | Used by |
+|-------|------|---------|
+| `.amb .ann .bwt .pac .sa` | `bwa index` | BWA (mapping) |
+| `.fai` | `samtools faidx` | SAMtools, BCFtools (next steps) |
+| `.dict` | `picard CreateSequenceDictionary` | Picard |
+
+### Option A: with the SLURM script (recommended)
+
+Edit the `GENOME` variable in `index_genome.sh`, then submit it:
+
+```bash
+sbatch index_genome.sh
+```
+
+### Option B: manually
+
+On a login node for a small genome, or in an interactive session (`srun --pty bash`) for a large one:
+
+```bash
+module load bwa/0.7.18/gcc samtools/1.23.1/gcc picard/2.18.29/java
+
+GENOME="/path/to/genome_reference.fa"
+
+bwa index ${GENOME}
+samtools faidx ${GENOME}
+picard CreateSequenceDictionary R=${GENOME} O=${GENOME%.*}.dict
+```
+
+### Checking the indexes
+
+The following files must exist next to the FASTA:
+
+```bash
+ls /path/to/genome_reference.fa*  /path/to/genome_reference.dict
+```
+
+Expected: `.fa`, `.fa.amb`, `.fa.ann`, `.fa.bwt`, `.fa.pac`, `.fa.sa`, `.fa.fai` and `.dict`.
 
 ## Configuration
 

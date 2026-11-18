@@ -11,7 +11,7 @@ This step assesses the quality of raw paired-end WGS FASTQ files with **FastQC**
 
 | Tool | Version |
 |------|---------|
-| FastQC | x.x.x |
+| FastQC | fastqc |
 | MultiQC | 1.31 |
 
 Modules are loaded with `module load fastqc` and `module load multiqc/1.31/gcc-py313`. Module names depend on your cluster: adapt them if needed.

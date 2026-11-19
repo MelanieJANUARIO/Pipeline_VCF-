@@ -42,7 +42,7 @@ Raw FASTQ
 ```
 
 ## Repository structure
-
+ 
 ```
 Pipeline_VCF/
 ├── 01_fastqc/
@@ -52,8 +52,13 @@ Pipeline_VCF/
 ├── 02_trimming/
 │   ├── trimmomatic.sh
 │   └── README.md
-├── 03_mapping/            
-├── 04_variant_calling/    
+├── 03_mapping/
+│   ├── Index_genome.sh
+│   ├── Mapping.sh
+│   └── README.md
+├── 04_variant_calling/
+│   ├── VCF.sh
+│   └── README.md
 └── README.md
 ```
 

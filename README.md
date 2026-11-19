@@ -64,10 +64,14 @@ Pipeline_VCF/
 | FastQC |Fastqc | 1 |
 | MultiQC | 1.31 | 1 |
 | Trimmomatic | 0.39 | 2 |
-| BWA | x.x.x | 3 |
-| Picard | x.x.x | 3 |
-| SAMtools | x.x | 3, 4 |
+| BWA | 0.7.18 | 3 |
+| Picard | 2.18.29 | 3 |
+| SAMtools | 1.23.1 | 3 (and genome indexing for 4) |
 | BCFtools | 1.23.1 | 4, 5, 6 |
+
+module load bwa/0.7.18/gcc
+module load samtools/1.23.1/gcc
+module load picard/2.18.29/java
 
 Make sure all tools are installed (or available as modules) and properly configured in your environment before running the pipeline. Module names in the scripts (`module load ...`) are specific to our cluster and may need to be adapted.
 

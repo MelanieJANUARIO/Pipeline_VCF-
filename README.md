@@ -52,8 +52,8 @@ Pipeline_VCF/
 ├── 02_trimming/
 │   ├── trimmomatic.sh
 │   └── README.md
-├── 03_mapping/            (in progress)
-├── 04_variant_calling/    (in progress)
+├── 03_mapping/            
+├── 04_variant_calling/    
 └── README.md
 ```
 
@@ -61,13 +61,13 @@ Pipeline_VCF/
 
 | Tool | Version | Used in step |
 |------|---------|--------------|
-| FastQC | x.x.x | 1 |
+| FastQC |Fastqc | 1 |
 | MultiQC | 1.31 | 1 |
 | Trimmomatic | 0.39 | 2 |
 | BWA | x.x.x | 3 |
 | Picard | x.x.x | 3 |
 | SAMtools | x.x | 3, 4 |
-| BCFtools | x.x | 4 |
+| BCFtools | 1.23.1 | 4, 5, 6 |
 
 Make sure all tools are installed (or available as modules) and properly configured in your environment before running the pipeline. Module names in the scripts (`module load ...`) are specific to our cluster and may need to be adapted.
 
